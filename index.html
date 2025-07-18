@@ -23,13 +23,15 @@
 
     <h2>Neuen Spruch hinzufügen</h2>
     <form id="neuer-spruch-form" class="mb-4 p-4 border rounded">
-        <div class="mb-3">
+        <div class="mb-3 input-with-counter">
             <label for="spruch-input" class="form-label">Spruch:</label>
             <textarea id="spruch-input" class="form-control" required></textarea>
+            <small id="spruch-char-count" class="char-counter">0 Zeichen</small>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 input-with-counter">
             <label for="autor-input" class="form-label">Autor:</label>
             <input type="text" id="autor-input" class="form-control" required>
+            <small id="autor-char-count" class="char-counter">0 Zeichen</small>
         </div>
         <button type="submit" class="btn btn-success">Speichern</button>
         <button type="reset" class="btn btn-secondary">Zurücksetzen</button>

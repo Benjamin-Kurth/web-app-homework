@@ -1,4 +1,4 @@
-// Schritt // Schritt 1: Elemente aus dem HTML "greifen".
+// Schritt 1: Elemente aus dem HTML "greifen".
 const spruchAnzeige = document.getElementById('spruch-anzeige');
 const randomSpruchBtn = document.getElementById('random-spruch-btn');
 const neuesSpruchForm = document.getElementById('neuer-spruch-form');
@@ -6,52 +6,85 @@ const spruchInput = document.getElementById('spruch-input');
 const autorInput = document.getElementById('autor-input');
 const spruchListe = document.getElementById('spruch-liste');
 
+// Elemente für die Zeichenzähler greifen
+const spruchCharCount = document.getElementById('spruch-char-count');
+const autorCharCount = document.getElementById('autor-char-count');
+
 // Schritt 2: Deine Daten. Füge hier gleich 2-3 deiner eigenen Lieblingssprüche hinzu!
 let sprueche = [
     { text: "Der Weg ist das Ziel.", autor: "Konfuzius" },
     { text: "Phantasie ist wichtiger als Wissen, denn Wissen ist begrenzt.", autor: "Albert Einstein" },
     { text: "Ich bin müde, Boss. Müde, immer unterwegs zu sein, einsam und verlassen. Müde, niemals einen Freund zu haben, der mir sagt, wohin wir gehen, woher wir kommen und warum. Am meisten müde bin ich, Menschen zu sehen, die hässlich zueinander sind. Der Schmerz auf der Welt und das viele Leid, das macht mich sehr müde. Es ist, als wären in meinem Kopf lauter Glasscherben.", autor: "John Coffey" },
     { text: "Was dich nicht herausfordert, verändert dich auch nicht.", autor: "Fred Devito" },
-    { text: "Du kannst deine Augen schließen, wenn du etwas nicht sehen willst, aber du kannst nicht dein Herz verschließen, wenn du etwas nicht fühlen willst.", autor: "Johnny Depp" }
+    { text: "Du kannst deine Augen schließen, wenn du etwas nicht sehen willst, aber du kannst nicht dein Herz verschließen, wenn du etwas nicht fühlen willst.", autor: "Johnny Depp" },
+    { text: "Das Leben ist wie Fahrrad fahren. Um die Balance zu halten, musst du in Bewegung bleiben.", autor: "Albert Einstein" },
+    { text: "Sei du selbst die Veränderung, die du dir wünschst für diese Welt.", autor: "Mahatma Gandhi" }
 ];
 
-// Schritt 3: Eine Funktion, die deine Sprüche-Liste im HTML anzeigt (mit Bubble-Struktur).
+// Funktion zum Anpassen der Schriftgröße langer Sprüche
+function adjustFontSizeForLongQuotes() {
+    const spruchTexte = document.querySelectorAll('.spruch-bubble .spruch-text');
+    const MAX_CHARS_SMALL_FONT = 150;
+    const MAX_CHARS_TINY_FONT = 250;
+
+    spruchTexte.forEach(pElement => {
+        const textLength = pElement.textContent.length;
+        pElement.classList.remove('small-font', 'tiny-font');
+
+        if (textLength > MAX_CHARS_TINY_FONT) {
+            pElement.classList.add('tiny-font');
+        } else if (textLength > MAX_CHARS_SMALL_FONT) {
+            pElement.classList.add('small-font');
+        }
+    });
+}
+
+// Funktion zum Erzeugen und Anzeigen der Sprüche in einer kreisförmigen Anordnung
 function renderSprueche() {
-    spruchListe.innerHTML = ''; // Leere die Liste, bevor sie neu befüllt wird
+    spruchListe.innerHTML = '';
+
+    const kreisContainer = document.createElement('div');
+    kreisContainer.id = 'kreis-container';
+    spruchListe.appendChild(kreisContainer);
 
     sprueche.forEach((spruch, index) => {
-        const li = document.createElement('li');
-        // 'list-group-item' bleibt, aber wir entfernen Flexbox-Klassen vom li,
-        // da die Bubble-Struktur das interne Layout übernimmt.
-        li.className = 'list-group-item'; 
-        
-        // Hier ist die neue Struktur für die Bubble/den Kreis
-        li.innerHTML = `
-            <div class="spruch-bubble">
-                <p class="mb-1 spruch-text">"${spruch.text}"</p>
-                <small class="text-muted fst-italic spruch-autor">- ${spruch.autor}</small>
-                <button type="button" class="btn btn-danger btn-sm mt-2 loeschen-button" data-index="${index}">Löschen</button>
-            </div>
+        const spruchElement = document.createElement('div');
+        spruchElement.className = 'spruch-bubble';
+        spruchElement.dataset.index = index;
+
+        spruchElement.innerHTML = `
+            <p class="spruch-text">"${spruch.text}"</p>
+            <small class="spruch-autor">- ${spruch.autor}</small>
+            <button type="button" class="btn btn-danger btn-sm mt-2 loeschen-button">Löschen</button>
         `;
-        // data-index wird weiterhin auf dem Button gesetzt, um ihn direkt zu identifizieren.
-        // Die Löschlogik im Event-Listener nutzt diesen Index nun wieder direkt.
         
-        spruchListe.appendChild(li); // Füge das fertige Listenelement zur ul-Liste hinzu
+        kreisContainer.appendChild(spruchElement);
     });
+
+    adjustFontSizeForLongQuotes();
+}
+
+
+// NEU: Funktion zur Aktualisierung des Zeichenzählers
+function updateCharCount(inputElement, countElement) {
+    const count = inputElement.value.length;
+    countElement.textContent = `${count} Zeichen`;
 }
 
 // Schritt 4: Auf das Absenden des Formulars reagieren.
 neuesSpruchForm.addEventListener('submit', function (event) {
-    event.preventDefault(); // Verhindert das Neuladen der Seite
-    const neuerSpruchText = spruchInput.value.trim(); // .trim() entfernt Leerzeichen
+    event.preventDefault();
+    const neuerSpruchText = spruchInput.value.trim();
     const neuerAutorText = autorInput.value.trim();
 
-    // Grundlegende Validierung der Eingabefelder
     if (neuerSpruchText && neuerAutorText) {
         const neuerSpruch = { text: neuerSpruchText, autor: neuerAutorText };
-        sprueche.push(neuerSpruch); // Füge den neuen Spruch zum Array hinzu
-        renderSprueche(); // Liste neu rendern, um den neuen Spruch anzuzeigen
-        neuesSpruchForm.reset(); // Formularfelder zurücksetzen
+        sprueche.push(neuerSpruch);
+        renderSprueche();
+        neuesSpruchForm.reset();
+        // Zähler nach dem Absenden zurücksetzen
+        updateCharCount(spruchInput, spruchCharCount);
+        updateCharCount(autorInput, autorCharCount);
     } else {
         alert('Bitte gib sowohl einen Spruch als auch einen Autor ein.');
     }
@@ -59,10 +92,9 @@ neuesSpruchForm.addEventListener('submit', function (event) {
 
 // Schritt 5: Auf den Klick des "Zufalls-Button" reagieren.
 randomSpruchBtn.addEventListener('click', function () {
-    // Überprüfe, ob überhaupt Sprüche vorhanden sind
     if (sprueche.length === 0) {
         spruchAnzeige.innerHTML = '<p>Keine Sprüche vorhanden. Füge welche hinzu!</p>';
-        return; // Beende die Funktion, wenn das Array leer ist
+        return;
     }
     const zufallsIndex = Math.floor(Math.random() * sprueche.length);
     const zufallsSpruch = sprueche[zufallsIndex];
@@ -74,24 +106,34 @@ randomSpruchBtn.addEventListener('click', function () {
 
 // Schritt 6: Event-Listener für die Löschfunktion (mit Event Delegation).
 spruchListe.addEventListener('click', function (event) {
-    // Überprüfe, ob das geklickte Element den 'loeschen-button' Klasse hat
     if (event.target.classList.contains('loeschen-button')) {
         const button = event.target;
-        // Lese den gespeicherten Index aus dem data-index Attribut des Buttons aus
-        const indexZumLoeschen = parseInt(button.dataset.index);
+        const spruchBubbleElement = button.closest('.spruch-bubble');
+        if (spruchBubbleElement) {
+            const indexZumLoeschen = parseInt(spruchBubbleElement.dataset.index);
 
-        // Sicherheitsprüfung: Ist der Index gültig und im Bereich des Arrays?
-        if (!isNaN(indexZumLoeschen) && indexZumLoeschen >= 0 && indexZumLoeschen < sprueche.length) {
-            const geloeschterSpruch = sprueche.splice(indexZumLoeschen, 1)[0];
-            console.log(`Gelöschter Spruch: "${geloeschterSpruch.text}" von ${geloeschterSpruch.autor}`);
-            
-            // Render die Liste neu, um den gelöschten Spruch zu entfernen und Indizes zu aktualisieren
-            renderSprueche(); 
+            if (!isNaN(indexZumLoeschen) && indexZumLoeschen >= 0 && indexZumLoeschen < sprueche.length) {
+                const geloeschterSpruch = sprueche.splice(indexZumLoeschen, 1)[0];
+                console.log(`Gelöschter Spruch: "${geloeschterSpruch.text}" von ${geloeschterSpruch.autor}`);
+                renderSprueche();
+            }
         }
     }
 });
 
+// Event-Listener für Eingabefelder, um Zähler bei jeder Eingabe zu aktualisieren
+spruchInput.addEventListener('input', () => {
+    updateCharCount(spruchInput, spruchCharCount);
+});
+
+autorInput.addEventListener('input', () => {
+    updateCharCount(autorInput, autorCharCount);
+});
+
 // Schritt 7: Die Sprüche-Liste initial rendern.
-// Dieser Event-Listener stellt sicher, dass die renderSprueche-Funktion erst ausgeführt wird,
-// wenn das gesamte HTML-Dokument geladen und parsiert wurde.
-document.addEventListener('DOMContentLoaded', renderSprueche);
+document.addEventListener('DOMContentLoaded', () => {
+    renderSprueche();
+    // Initialer Aufruf der Zähler, falls Felder schon vorbefüllt sind
+    updateCharCount(spruchInput, spruchCharCount);
+    updateCharCount(autorInput, autorCharCount);
+});
