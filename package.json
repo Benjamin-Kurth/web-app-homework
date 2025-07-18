@@ -1,0 +1,24 @@
+{
+  "name": "spruch-des-tages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Benjamin-Kurth/web-app-homework.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Benjamin-Kurth/web-app-homework/issues"
+  },
+  "homepage": "https://github.com/Benjamin-Kurth/web-app-homework#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
